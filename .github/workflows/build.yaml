@@ -3,6 +3,8 @@ on:
   push:
     paths:
       - "**.js"
+      - ".github/workflows/build.yaml"
+  workflow_dispatch:
 
 jobs:
   build:
