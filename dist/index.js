@@ -9873,7 +9873,8 @@ function writeCommitMessage(context, branch) {
 function getBranchName(eventName, payload) {
     let branchName;
     switch (eventName) {
-        case ("push", "workflow_dispatch"):
+        case "push":
+        case "workflow_dispatch":
             branchName = payload.ref.replace("refs/heads/", "");
             break;
         case "pull_request":
