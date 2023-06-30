@@ -9854,13 +9854,13 @@ const github = __nccwpck_require__(5438);
 
 const validEvent = ["push", "pull_request", "workflow_dispatch"];
 
-const octokit = github.getOctokit(core.getInput("token"));
+
 
 /**
  *
  * @param {github.context} context
  */
-function writeCommitMessage(context, branch) {
+function writeCommitMessage(octokit, context, branch) {
     const repoName = context.payload.repository.full_name.split("/");
     octokit.rest.repos.createCommitComment({
         owner: repoName[0],
@@ -9889,6 +9889,7 @@ function getBranchName(eventName, payload) {
 async function run() {
     core.info(JSON.stringify(github.context));
     try {
+        const octokit = github.getOctokit(core.getInput("token"));
         const eventName = github.context.eventName;
         core.info(`Event name: ${eventName}`);
         if (validEvent.indexOf(eventName) < 0) {
@@ -9930,7 +9931,7 @@ async function run() {
             core.setFailed(
                 `Branch ${branch} failed did not match any of the prefixes - ${prefixes}`
             );
-            writeCommitMessage(github.context, branch);
+            writeCommitMessage(octokit, github.context, branch);
             return;
         }
 
