@@ -1,7 +1,7 @@
 const core = require("@actions/core");
 const github = require("@actions/github");
 
-const validEvent = ["push", "pull_request"];
+const validEvent = ["push", "pull_request", "workflow_dispatch"];
 
 function getBranchName(eventName, payload) {
     let branchName;
@@ -19,25 +19,6 @@ function getBranchName(eventName, payload) {
 }
 
 async function run() {
-    core.error("\u001b[1mBold text");
-    core.info("\u001b[3mItalic text");
-    core.info("\u001b[4mUnderlined text");
-    // 3/4 bit
-    core.warning("\u001b[43mThis background will be yellow");
-
-    // 8 bit
-    core.notice("\u001b[48;5;6mThis background will be cyan");
-
-    // 24 bit
-    core.info("\u001b[48;2;255;0;0mThis background will be bright red");
-    // 3/4 bit
-    core.info("\u001b[35mThis foreground will be magenta");
-
-    // 8 bit
-    core.info("\u001b[38;5;6mThis foreground will be cyan");
-
-    // 24 bit
-    core.info("\u001b[38;2;255;0;0mThis foreground will be bright red");
     try {
         const eventName = github.context.eventName;
         core.info(`Event name: ${eventName}`);
@@ -45,7 +26,7 @@ async function run() {
             core.setFailed(`Invalid event: ${eventName}`);
             return;
         }
-
+        core.debug(JSON.stringify(github.context));
         const branch = getBranchName(eventName, github.context.payload);
         core.info(`Branch name: ${branch}`);
         // Check if branch is to be ignored
