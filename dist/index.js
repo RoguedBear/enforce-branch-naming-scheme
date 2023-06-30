@@ -9792,15 +9792,15 @@ var __webpack_exports__ = {};
 const core = __nccwpck_require__(2186);
 const github = __nccwpck_require__(5438);
 
-const validEvent = ['push', 'pull_request'];
+const validEvent = ["push", "pull_request"];
 
 function getBranchName(eventName, payload) {
     let branchName;
     switch (eventName) {
-        case 'push':
-            branchName = payload.ref.replace('refs/heads/', '');
+        case "push":
+            branchName = payload.ref.replace("refs/heads/", "");
             break;
-        case 'pull_request':
+        case "pull_request":
             branchName = payload.pull_request.head.ref;
             break;
         default:
@@ -9810,6 +9810,25 @@ function getBranchName(eventName, payload) {
 }
 
 async function run() {
+    core.info("\u001b[1mBold text");
+    core.info("\u001b[3mItalic text");
+    core.info("\u001b[4mUnderlined text");
+    // 3/4 bit
+    core.info("\u001b[43mThis background will be yellow");
+
+    // 8 bit
+    core.info("\u001b[48;5;6mThis background will be cyan");
+
+    // 24 bit
+    core.info("\u001b[48;2;255;0;0mThis background will be bright red");
+    // 3/4 bit
+    core.info("\u001b[35mThis foreground will be magenta");
+
+    // 8 bit
+    core.info("\u001b[38;5;6mThis foreground will be cyan");
+
+    // 24 bit
+    core.info("\u001b[38;2;255;0;0mThis foreground will be bright red");
     try {
         const eventName = github.context.eventName;
         core.info(`Event name: ${eventName}`);
@@ -9821,40 +9840,56 @@ async function run() {
         const branch = getBranchName(eventName, github.context.payload);
         core.info(`Branch name: ${branch}`);
         // Check if branch is to be ignored
-        const ignore = core.getInput('ignore');
-        if (ignore.length > 0 && ignore.split(',').some((el) => branch === el)) {
-            core.info(`Skipping checks since ${branch} is in the ignored list - ${ignore}`);
-            return
+        const ignore = core.getInput("ignore");
+        if (
+            ignore.length > 0 &&
+            ignore.split(",").some((el) => branch === el)
+        ) {
+            core.info(
+                `Skipping checks since ${branch} is in the ignored list - ${ignore}`
+            );
+            return;
         }
 
         // Check if branch pass regex
-        const regex = RegExp(core.getInput('regex'));
+        const regex = RegExp(core.getInput("regex"));
         core.info(`Regex: ${regex}`);
         if (!regex.test(branch)) {
-            core.setFailed(`Branch ${branch} failed to pass match regex - ${regex}`);
-            return
+            core.setFailed(
+                `Branch ${branch} failed to pass match regex - ${regex}`
+            );
+            return;
         }
 
         // Check if branch starts with a prefix
-        const prefixes = core.getInput('allowed_prefixes');
+        const prefixes = core.getInput("allowed_prefixes");
         core.info(`Allowed Prefixes: ${prefixes}`);
-        if (prefixes.length > 0 && !prefixes.split(',').some((el) => branch.startsWith(el))) {
-            core.setFailed(`Branch ${branch} failed did not match any of the prefixes - ${prefixes}`);
-            return
+        if (
+            prefixes.length > 0 &&
+            !prefixes.split(",").some((el) => branch.startsWith(el))
+        ) {
+            core.setFailed(
+                `Branch ${branch} failed did not match any of the prefixes - ${prefixes}`
+            );
+            return;
         }
 
         // Check min length
-        const minLen = parseInt(core.getInput('min_length'));
+        const minLen = parseInt(core.getInput("min_length"));
         if (branch.length < minLen) {
-            core.setFailed(`Branch ${branch} is smaller than min length specified - ${minLen}`);
-            return
+            core.setFailed(
+                `Branch ${branch} is smaller than min length specified - ${minLen}`
+            );
+            return;
         }
 
         // Check max length
-        const maxLen = parseInt(core.getInput('max_length'));
+        const maxLen = parseInt(core.getInput("max_length"));
         if (maxLen > 0 && branch.length > maxLen) {
-            core.setFailed(`Branch ${branch} is greater than max length specified - ${maxLen}`);
-            return
+            core.setFailed(
+                `Branch ${branch} is greater than max length specified - ${maxLen}`
+            );
+            return;
         }
     } catch (error) {
         core.setFailed(error.message);
