@@ -9812,12 +9812,12 @@ function getBranchName(eventName, payload) {
 async function run() {
     try {
         const eventName = github.context.eventName;
+        core.debug(JSON.stringify(github.context));
         core.info(`Event name: ${eventName}`);
         if (validEvent.indexOf(eventName) < 0) {
             core.setFailed(`Invalid event: ${eventName}`);
             return;
         }
-        core.debug(JSON.stringify(github.context));
         const branch = getBranchName(eventName, github.context.payload);
         core.info(`Branch name: ${branch}`);
         // Check if branch is to be ignored
