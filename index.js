@@ -1,12 +1,30 @@
 const core = require("@actions/core");
 const github = require("@actions/github");
 
-const validEvent = ["push", "pull_request"];
+import { getCommentMessage } from "./strings";
+
+const validEvent = ["push", "pull_request", "workflow_dispatch"];
+
+const octokit = github.getOctokit(core.getInput("repo-token"));
+
+/**
+ *
+ * @param {github.context} context
+ */
+function writeCommitMessage(context, branch) {
+    const repoName = context.payload.repository.full_name.split("/");
+    octokit.rest.repos.createCommitComment({
+        owner: repoName[0],
+        repo: repoName[1],
+        commit_sha: context.sha,
+        body: getCommentMessage(branch),
+    });
+}
 
 function getBranchName(eventName, payload) {
     let branchName;
     switch (eventName) {
-        case "push":
+        case ("push", "workflow_dispatch"):
             branchName = payload.ref.replace("refs/heads/", "");
             break;
         case "pull_request":
@@ -19,6 +37,7 @@ function getBranchName(eventName, payload) {
 }
 
 async function run() {
+    core.info(JSON.stringify(github.context));
     try {
         const eventName = github.context.eventName;
         core.info(`Event name: ${eventName}`);
@@ -26,9 +45,9 @@ async function run() {
             core.setFailed(`Invalid event: ${eventName}`);
             return;
         }
-
         const branch = getBranchName(eventName, github.context.payload);
         core.info(`Branch name: ${branch}`);
+
         // Check if branch is to be ignored
         const ignore = core.getInput("ignore");
         if (
@@ -61,6 +80,7 @@ async function run() {
             core.setFailed(
                 `Branch ${branch} failed did not match any of the prefixes - ${prefixes}`
             );
+            writeCommitMessage(github.context, branch);
             return;
         }
 

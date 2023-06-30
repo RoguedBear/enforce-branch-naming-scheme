@@ -9781,23 +9781,99 @@ module.exports = JSON.parse('[[[0,44],"disallowed_STD3_valid"],[[45,46],"valid"]
 /******/ 	}
 /******/ 	
 /************************************************************************/
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__nccwpck_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
 /******/ 	/* webpack/runtime/compat */
 /******/ 	
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
+// This entry need to be wrapped in an IIFE because it need to be in strict mode.
 (() => {
+"use strict";
+// ESM COMPAT FLAG
+__nccwpck_require__.r(__webpack_exports__);
+
+;// CONCATENATED MODULE: ./strings.js
+function getCommentMessage(oldBranchName) {
+    // TODO: add a list of allowed branches in herewhen that part is implemnted
+    return `
+    #### ⚠️⚠️ Your branch name \`${oldBranchName}\` does not conform with the 
+    branch naming strategies defined in your repository:
+
+    ${"```"}
+    <BRANCH REGEXES>
+    ${"```"}
+
+    but do not worry, you just have to rename the branch you have created to pass
+    this check
+
+    ## Renaming your branch locally and on remote
+
+    pick any of the prefix that applies to your changes, and replace \`<new_name>\`
+    with that.
+
+    example: \`feature/${oldBranchName}\`
+
+    ${"```"}
+    # Rename the local branch to the new name
+    git branch -m ${oldBranchName} <new_name>
+
+    # Delete the old branch on remote - where <remote> is, for example, origin
+    git push origin --delete ${oldBranchName}
+
+    # Prevent git from using the old name when pushing in the next step.
+    # Otherwise, git will use the old upstream name instead of <new_name>.
+    git branch --unset-upstream <new_name>
+
+    # Push the new branch to remote
+    git push origin <new_name>
+
+    # Reset the upstream branch for the new_name local branch
+    git push origin -u <new_name>
+    ${"```"}
+
+    for detailed explanation, refer: https://stackoverflow.com/a/30590238`;
+}
+
+;// CONCATENATED MODULE: ./index.js
 const core = __nccwpck_require__(2186);
 const github = __nccwpck_require__(5438);
 
-const validEvent = ["push", "pull_request"];
+
+
+const validEvent = ["push", "pull_request", "workflow_dispatch"];
+
+const octokit = github.getOctokit(core.getInput("repo-token"));
+
+/**
+ *
+ * @param {github.context} context
+ */
+function writeCommitMessage(context, branch) {
+    const repoName = context.payload.repository.full_name.split("/");
+    octokit.rest.repos.createCommitComment({
+        owner: repoName[0],
+        repo: repoName[1],
+        commit_sha: context.sha,
+        body: getCommentMessage(branch),
+    });
+}
 
 function getBranchName(eventName, payload) {
     let branchName;
     switch (eventName) {
-        case "push":
+        case ("push", "workflow_dispatch"):
             branchName = payload.ref.replace("refs/heads/", "");
             break;
         case "pull_request":
@@ -9810,6 +9886,7 @@ function getBranchName(eventName, payload) {
 }
 
 async function run() {
+    core.info(JSON.stringify(github.context));
     try {
         const eventName = github.context.eventName;
         core.info(`Event name: ${eventName}`);
@@ -9817,9 +9894,9 @@ async function run() {
             core.setFailed(`Invalid event: ${eventName}`);
             return;
         }
-
         const branch = getBranchName(eventName, github.context.payload);
         core.info(`Branch name: ${branch}`);
+
         // Check if branch is to be ignored
         const ignore = core.getInput("ignore");
         if (
@@ -9852,6 +9929,7 @@ async function run() {
             core.setFailed(
                 `Branch ${branch} failed did not match any of the prefixes - ${prefixes}`
             );
+            writeCommitMessage(github.context, branch);
             return;
         }
 
