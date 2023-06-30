@@ -9810,14 +9810,14 @@ function getBranchName(eventName, payload) {
 }
 
 async function run() {
-    core.info("\u001b[1mBold text");
+    core.error("\u001b[1mBold text");
     core.info("\u001b[3mItalic text");
     core.info("\u001b[4mUnderlined text");
     // 3/4 bit
-    core.info("\u001b[43mThis background will be yellow");
+    core.warning("\u001b[43mThis background will be yellow");
 
     // 8 bit
-    core.info("\u001b[48;5;6mThis background will be cyan");
+    core.notice("\u001b[48;5;6mThis background will be cyan");
 
     // 24 bit
     core.info("\u001b[48;2;255;0;0mThis background will be bright red");
