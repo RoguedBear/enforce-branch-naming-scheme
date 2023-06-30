@@ -2,9 +2,9 @@ name: 'Branch name rules'
 description: 'Github action to enforce naming convention on branch names'
 author: 'deepakputhraya'
 inputs:
-  repo-token:
-    description: 'GITHUB_TOKEN used to make comments on commits or Pull requests'
-    required: true
+  token:
+    description: 'The GitHub authentication token'
+    default: ${{ github.token }}
   regex:
     description: 'Regex to validate the branch name'
     default: ''

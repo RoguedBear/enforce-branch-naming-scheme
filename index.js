@@ -5,7 +5,7 @@ import { getCommentMessage } from "./strings";
 
 const validEvent = ["push", "pull_request", "workflow_dispatch"];
 
-const octokit = github.getOctokit(core.getInput("repo-token"));
+const octokit = github.getOctokit(core.getInput("token"));
 
 /**
  *
