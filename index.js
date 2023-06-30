@@ -20,7 +20,7 @@ function getBranchName(eventName, payload) {
 
 async function run() {
     core.info("test");
-    core.debug(JSON.stringify(github.context));
+    core.info(JSON.stringify(github.context));
     try {
         const eventName = github.context.eventName;
         core.info(`Event name: ${eventName}`);
