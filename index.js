@@ -19,9 +19,10 @@ function getBranchName(eventName, payload) {
 }
 
 async function run() {
+    core.info("test");
+    core.debug(JSON.stringify(github.context));
     try {
         const eventName = github.context.eventName;
-        core.debug(JSON.stringify(github.context));
         core.info(`Event name: ${eventName}`);
         if (validEvent.indexOf(eventName) < 0) {
             core.setFailed(`Invalid event: ${eventName}`);
