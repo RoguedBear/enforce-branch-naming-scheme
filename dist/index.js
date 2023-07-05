@@ -9808,9 +9808,9 @@ __nccwpck_require__.r(__webpack_exports__);
 function getCommentMessage(oldBranchName) {
     // TODO: add a list of allowed branches in herewhen that part is implemnted
     return `
-#### ⚠️⚠️ Your branch name \`${oldBranchName}\` does not conform with the 
-branch naming strategies defined in your repository:
+# ⚠️⚠️ Your branch name \`${oldBranchName}\` does not conform with the branch naming strategies defined in your repository
 
+These are the branch naming schemes defined in this repository:
 ${"```"}
 <BRANCH REGEXES>
 ${"```"}
